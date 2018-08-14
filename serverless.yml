@@ -1,0 +1,20 @@
+service: serverless
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+  # Use an existing AWS profile defined in ~/.aws/credentials
+  # see, https://serverless.com/framework/docs/providers/aws/guide/credentials#use-an-existing-aws-profile
+  profile: brianpatrickkemper
+
+  # One Custom IAM Role For All Functions
+  # note, can easily tweak the role in AWS console
+  # see, https://serverless.com/framework/docs/providers/aws/guide/credentials#one-custom-iam-role-for-all-functions
+  role: arn:aws:iam::862171441940:role/storeFitbitHeartRate
+
+functions:
+  storeFitbitHeartRate:
+    handler: handler.storeFitbitHeartRate
+    events:
+      - schedule: cron(0,5,10,15,20,25,30,35,40,45,50,55,59 * * * ? *)
