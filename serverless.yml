@@ -1,4 +1,4 @@
-service: serverless
+service: brianpatrickkemper
 
 provider:
   name: aws
