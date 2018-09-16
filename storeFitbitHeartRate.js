@@ -6,6 +6,20 @@ const { DateTime, Settings } = require('luxon');
 
 Settings.defaultZoneName = 'America/New_York';
 
+/**
+ * Steps to generate Fitbit access token
+ *
+ * 1. register app, https://dev.fitbit.com/apps
+ * 2. click "OAuth 2.0 tutorial page" link
+ * 3. check "Implicit Grant Flow" option
+ * 4. check only "heartrate" from "Select Scopes"
+ * 5. enter "63072000000" (2 years) for "Expires In(ms)"
+ * 6. click the https://www.fitbit.com/oauth2/authorize?... link [redirects to your website]
+ * 7. get access token from query string of redirect URL
+ *
+ * see authorization code grant flow, https://dev.fitbit.com/build/reference/web-api/oauth2/#authorization-code-grant-flow
+ * todo, move secrets from ENVs to AWS Secret Manager
+ */
 module.exports = async function storeFitbitHeartRate() {
   const fitbit = axios.create({
     baseURL: `https://api.fitbit.com/1/user/${process.env.FITBIT_USER_ID}`,
