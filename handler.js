@@ -1,12 +1,16 @@
 'use strict';
-const storeFitbitHeartRate = require('./storeFitbitHeartRate');
 
-module.exports.storeFitbitHeartRate = async function(event, context, callback) {
-  try {
-    console.log(await storeFitbitHeartRate());
-  } catch(error) {
-    console.error(error); // shh
+function handle(fn) {
+  return async function(event, context, callback) {
+    try {
+      console.log(await fn());
+    } catch(error) {
+      console.error(error); // shh
+    }
+
+    callback();
   }
-
-  callback();
 }
+
+module.exports.storeFitbitHeartRate = handle(require('./storeFitbitHeartRate'));
+module.exports.storeGithubEvents = handle(require('./storeGithubEvents'));
