@@ -1,3 +1,3 @@
-# Store Fitbit Heart Rate
+# My Data
 
-This is an AWS Lambda that routinely fetches, normalizes, and stores my Fitbit heart rate data in an S3 bucket.
+These are AWS Lambdas to routinely fetches, normalizes, and stores my data in S3 buckets.
