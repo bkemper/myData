@@ -1,8 +1,10 @@
 'use strict';
 
-const aws = require('aws-sdk');
 const axios = require('axios');
 const { DateTime, Settings } = require('luxon');
+const getSecrets = require('./helpers/getSecrets');
+const log = require('./helpers/log');
+const putObject = require('./helpers/putObject');
 
 Settings.defaultZoneName = 'America/New_York';
 
@@ -72,39 +74,36 @@ const events = {
 };
 const noop = () => (undefined);
 
-module.exports = async function storeGithubEvents() {
-  const github = axios.create({
-    baseURL: `https://api.github.com`,
-    headers: {
-      Authorization: `token ${process.env.GITHUB_ACCESS_TOKEN}`
-    },
-    timeout: 60 * 1000,
-  });
-  const s3 = new aws.S3(); // inherit from the provider.role
-  const today = DateTime.local().toISODate(); // 2018-05-03
+module.exports = async function storeGithubEvents({ BUCKET, TODAY = DateTime.local().toISODate() }) {
+  const {
+    GITHUB_ACCESS_TOKEN,
+    GITHUB_USERNAME
+  } = await getSecrets('GITHUB_ACCESS_TOKEN', 'GITHUB_USERNAME');
 
   // Has a fixed page size of 30 items, if I do more than that in one day then oh well
   // see, https://developer.github.com/v3/activity/events/#list-events-performed-by-a-user
-  const { data } = await github.get(`/users/${process.env.GITHUB_USERNAME}/events`);
+  const { data } = await axios({
+    url: `https://api.github.com/users/${GITHUB_USERNAME}/events`,
+    headers: {
+      Authorization: `token ${GITHUB_ACCESS_TOKEN}`
+    },
+    timeout: 60 * 1000
+  });
 
+  // Transform
   const normalizedEvents = data.reduce((accumulator, { type, ...event }) => {
     const eventDefinition = events[type] || noop;
     const normalizedEvent = eventDefinition(event);
 
-    if (DateTime.fromISO(event.created_at).toISODate() !== today || !normalizedEvent) {
+    if (DateTime.fromISO(event.created_at).toISODate() !== TODAY || !normalizedEvent) {
       return accumulator; // ignore
     }
 
     return [...accumulator, normalizedEvent];
   }, []);
 
-  // Write to S3 file
-  await s3.putObject({
-    ACL: 'public-read',
-    Body: JSON.stringify(normalizedEvents),
-    Bucket: process.env.S3_BUCKET,
-    Key: `${today}.json`,
-  }).promise();
+  // Load
+  await putObject({ bucket: BUCKET, key: `${TODAY}.json`, data: normalizedEvents });
 
-  return { today, size: normalizedEvents.length };
+  log({ today: TODAY, size: normalizedEvents.length });
 }

@@ -2,7 +2,7 @@ service: brianpatrickkemper
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs10.x
 
   # Use an existing AWS profile defined in ~/.aws/credentials
   # see, https://serverless.com/framework/docs/providers/aws/guide/credentials#use-an-existing-aws-profile
@@ -18,7 +18,13 @@ functions:
     handler: handler.storeFitbitHeartRate
     events:
       - schedule: cron(0,5,10,15,20,25,30,35,40,45,50,55,59 * * * ? *)
+    environment:
+      BUCKET: bpk-heartrate
+    memorySize: 512
   storeGithubEvents:
     handler: handler.storeGithubEvents
     events:
       - schedule: cron(0,10,20,30,40,50,59 * * * ? *)
+    environment:
+      BUCKET: bpk-github-events
+    memorySize: 512
