@@ -6,6 +6,7 @@ const getSecrets = require('./helpers/getSecrets');
 const log = require('./helpers/log');
 const putObject = require('./helpers/putObject');
 const putSecret = require('./helpers/putSecret');
+const toBase64 = require('./helpers/toBase64');
 
 Settings.defaultZoneName = 'America/New_York';
 
@@ -37,7 +38,7 @@ module.exports = async function storeFitbitHeartRate({ BUCKET, TODAY = DateTime.
     method: 'post',
     url: 'https://api.fitbit.com/oauth2/token',
     headers: {
-      Authorization: `Basic ${new Buffer(`${FITBIT_CLIENT_ID}:${FITBIT_CLIENT_SECRET}`).toString('base64')}`,
+      Authorization: `Basic ${toBase64(`${FITBIT_CLIENT_ID}:${FITBIT_CLIENT_SECRET}`)}`,
       'Content-Type': 'application/x-www-form-urlencoded'
     },
     data: `grant_type=refresh_token&refresh_token=${FITBIT_REFRESH_TOKEN}`,

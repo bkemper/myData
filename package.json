@@ -15,6 +15,7 @@
   "scripts": {
     "bump": "yarn upgrade-interactive --latest",
     "deploy": "serverless deploy function --function",
+    "deploy:service": "serverless deploy",
     "invoke": "serverless invoke local --function",
     "test": "jest --watch"
   }

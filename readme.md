@@ -2,3 +2,4 @@
 
 - Fitbit
 - GitHub
+- Spotify

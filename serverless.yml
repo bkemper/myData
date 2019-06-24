@@ -28,3 +28,10 @@ functions:
     environment:
       BUCKET: bpk-github-events
     memorySize: 512
+  storeSpotifySongs:
+    handler: handler.storeSpotifySongs
+    events:
+      - schedule: cron(0,5,10,15,20,25,30,35,40,45,50,55,59 * * * ? *)
+    environment:
+      BUCKET: bpk-spotify-songs
+    memorySize: 512
